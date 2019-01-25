@@ -28,7 +28,7 @@ public class Downloader {
 
     public void downloadContents(List<CourseContent> contents) throws InterruptedException {
 
-        contents.subList(0,1).stream().map(this::download).forEach(executor::execute);
+        contents.stream().map(this::download).forEach(executor::execute);
 
         executor.shutdown();
 
