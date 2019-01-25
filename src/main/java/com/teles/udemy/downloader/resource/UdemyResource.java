@@ -14,18 +14,19 @@ import feign.optionals.OptionalDecoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Optional;
-
 public interface UdemyResource {
 
     @RequestLine("GET /users/me/subscribed-courses?fields")
-    Optional<SubscribedCoursesResponse> getSubscribedCourses();
+    SubscribedCoursesResponse getSubscribedCourses();
 
     @RequestLine("GET /courses/{courseId}/cached-subscriber-curriculum-items/?page_size=1400")
-    Optional<CourseResponse> getCourse(@Param("courseId") Long courseId);
+    CourseResponse getCourse(@Param("courseId") Long courseId);
 
     @RequestLine("GET /assets/{assetId}?fields[asset]=stream_urls")
-    Optional<LectureAssetsResponse> getLectureAssets(@Param("assetId") Long assetId);
+    LectureAssetsResponse getAssets(@Param("assetId") Long assetId);
+
+    @RequestLine("GET /assets/{assetId}")
+    LectureAssetsResponse getLectureDetails(@Param("assetId") Long assetId);
 
     @Configuration
     class Config {
@@ -44,10 +45,14 @@ public interface UdemyResource {
                     .decoder(new OptionalDecoder(new JacksonDecoder()))
                     .encoder(new JacksonEncoder())
                     .requestInterceptor(template -> template
-                            .header("Authorization", "Bearer " + settings.getHeaders().getAuthorization())
-                            .header("X-Udemy-Authorization", "Bearer " + settings.getHeaders().getXUdemyAuthorization()))
+                            .header("Authorization", getToken())
+                            .header("X-Udemy-Authorization", getToken()))
                     .decode404()
                     .target(UdemyResource.class, settings.getApiUrl());
+        }
+
+        private String getToken() {
+            return "Bearer " + settings.getAuthorizationToken();
         }
 
     }

@@ -9,6 +9,9 @@ import java.util.List;
 @Data
 public class SubscribedCoursesResponse {
 
+    @JsonProperty("title")
+    private String sectionTitle;
+
     @JsonProperty("results")
     private List<SubscribedCourse> courses = new ArrayList<>();
 

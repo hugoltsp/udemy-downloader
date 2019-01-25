@@ -9,10 +9,18 @@ import java.util.List;
 @Data
 public class LectureAssetsResponse {
 
+    private Long id;
+
     private String title;
 
     @JsonProperty("stream_urls")
     private StreamContent streamContents;
+
+    private List<Caption> captions = new ArrayList<>();
+
+    public boolean hasContent() {
+        return streamContents != null;
+    }
 
     @Data
     public static class StreamContent {
@@ -23,9 +31,17 @@ public class LectureAssetsResponse {
     }
 
     @Data
+    public static class Caption {
+
+        private String url;
+
+    }
+
+    @Data
     public static class Video {
 
-        private String label;
+        @JsonProperty("label")
+        private String resolution;
 
         private String file;
     }

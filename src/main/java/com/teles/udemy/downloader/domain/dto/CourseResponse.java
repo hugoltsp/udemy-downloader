@@ -9,8 +9,6 @@ import java.util.List;
 @Data
 public class CourseResponse {
 
-    private int count;
-
     @JsonProperty("results")
     private List<Lecture> lectures = new ArrayList<>();
 
@@ -22,14 +20,17 @@ public class CourseResponse {
         private String title;
 
         private Asset asset;
+
+        public boolean hasAsset() {
+            return asset != null;
+        }
+
     }
 
     @Data
     public static class Asset {
 
         private Long id;
-
-        private String fileName;
 
     }
 
