@@ -4,7 +4,6 @@ import com.teles.udemy.downloader.domain.dto.Course;
 import com.teles.udemy.downloader.domain.dto.Course.CourseContent;
 import com.teles.udemy.downloader.domain.dto.CourseResponse.Lecture;
 import com.teles.udemy.downloader.domain.dto.LectureAssetsResponse;
-import com.teles.udemy.downloader.domain.dto.SubscribedCoursesResponse;
 import com.teles.udemy.downloader.domain.dto.SubscribedCoursesResponse.SubscribedCourse;
 import com.teles.udemy.downloader.domain.settings.ApplicationSettings;
 import com.teles.udemy.downloader.resource.UdemyResource;
@@ -46,12 +45,12 @@ public class CourseContentFetcher {
                     .stream()
                     .filter(subscribedCourse -> settings.getCourses().contains(subscribedCourse.getTitle()))
                     .collect(Collectors.toList());
-        }
 
-        log.info("Will download lectures from the following courses: [{}]", subscribedCoursesCourses
-                .stream()
-                .map(SubscribedCourse::getTitle)
-                .collect(Collectors.joining("\n")));
+            log.info("Will download lectures from the following courses: [{}]", subscribedCoursesCourses
+                    .stream()
+                    .map(SubscribedCourse::getTitle)
+                    .collect(Collectors.joining("\n")));
+        }
 
         subscribedCoursesCourses.stream().map(Course::build).peek(courses::add).forEach(course -> {
 
