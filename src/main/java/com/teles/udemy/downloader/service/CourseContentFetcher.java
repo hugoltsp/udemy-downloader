@@ -34,14 +34,26 @@ public class CourseContentFetcher {
 
         log.info("Getting subscribed courses...");
 
-        SubscribedCoursesResponse subscribedCourses = udemyResource.getSubscribedCourses();
+        List<SubscribedCourse> subscribedCoursesCourses = udemyResource.getSubscribedCourses().getCourses();
 
-        log.info("A total of [{}] courses found. Titles are: {}", subscribedCourses.getCourses().size(), subscribedCourses.getCourses()
+        log.info("A total of [{}] courses found. Titles are: {}", subscribedCoursesCourses.size(), subscribedCoursesCourses
                 .stream()
                 .map(SubscribedCourse::getTitle)
                 .collect(Collectors.joining("\n")));
 
-        subscribedCourses.getCourses().subList(0, 1).stream().map(Course::build).peek(courses::add).forEach(course -> {
+        if (settings.shouldFilterCourses()) {
+            subscribedCoursesCourses = subscribedCoursesCourses
+                    .stream()
+                    .filter(subscribedCourse -> settings.getCourses().contains(subscribedCourse.getTitle()))
+                    .collect(Collectors.toList());
+        }
+
+        log.info("Will download lectures from the following courses: [{}]", subscribedCoursesCourses
+                .stream()
+                .map(SubscribedCourse::getTitle)
+                .collect(Collectors.joining("\n")));
+
+        subscribedCoursesCourses.stream().map(Course::build).peek(courses::add).forEach(course -> {
 
             log.info("Getting lectures from course: [{}]", course.getCourseName());
 

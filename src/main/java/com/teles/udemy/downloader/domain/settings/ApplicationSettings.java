@@ -23,6 +23,12 @@ public class ApplicationSettings {
 
     private String output;
 
+    private String courses;
+
+    public boolean shouldFilterCourses() {
+        return courses != null && !courses.trim().isEmpty();
+    }
+
     @PostConstruct
     private void init() {
         log.info(toString());

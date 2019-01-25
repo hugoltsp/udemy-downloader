@@ -1,6 +1,7 @@
 app:
   apiUrl: https://naspers.udemy.com/api-2.0
-  authorizationToken: XInnD52a4rjc0woi9WONItiOIZd70JTZevKOM50s
+  authorizationToken: place-yours-here
   videoResolution: 720
   output: ${HOME}/udemy-out
   concurrentDownloads: 10
+  courses: null
