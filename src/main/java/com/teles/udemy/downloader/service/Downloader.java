@@ -49,8 +49,8 @@ public class Downloader {
                     write(outputStream, inputStream);
                 }
 
-            } catch (IOException e) {
-                log.error("An error ocurred while trying to download this file [{}]", c.getFileUrl(), e);
+            } catch (Exception e) {
+                log.error("An error ocurred while trying to download this file [{}]", c, e);
             }
         };
     }

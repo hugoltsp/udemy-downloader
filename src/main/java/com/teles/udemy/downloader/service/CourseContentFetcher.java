@@ -58,11 +58,7 @@ public class CourseContentFetcher {
 
             log.info("Getting lectures from course: [{}]", course.getCourseName());
 
-            List<Lecture> lectures = udemyResource.getCourse(course.getCourseId())
-                    .getLectures()
-                    .stream()
-                    .filter(Lecture::hasAsset)
-                    .collect(Collectors.toList());
+            List<Lecture> lectures = getLectures(course.getCourseId());
 
             log.info("Found [{}] lectures.", lectures.size());
 
@@ -84,22 +80,8 @@ public class CourseContentFetcher {
                             .get()
                             .getFile());
 
-                    List<CourseContent> collect = udemyResource.getLectureCaptions(lecture.getAsset().getId())
-                            .getCaptions()
-                            .stream()
-                            .filter(this::hasLocale)
-                            .map(c -> {
-                                CourseContent s = new CourseContent();
-                                s.setFileName(c.getFileName());
-                                s.setFileUrl(c.getUrl());
-                                s.setCourseName(course.getCourseName());
-                                s.setLectureName(lecture.getTitle());
-                                return s;
-                            }).collect(Collectors.toList());
-
                     course.getContents().add(courseContent);
-                    course.getContents().addAll(collect);
-
+                    course.getContents().addAll(getSubtitles(lecture, course));
                 }
 
             });
@@ -107,6 +89,29 @@ public class CourseContentFetcher {
         });
 
         return courses.stream().map(Course::getContents).flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    private List<Lecture> getLectures(Long courseId){
+        return udemyResource.getCourse(courseId)
+                .getLectures()
+                .stream()
+                .filter(Lecture::hasAsset)
+                .collect(Collectors.toList());
+    }
+
+    private List<CourseContent> getSubtitles(Lecture lecture, Course course) {
+        return udemyResource.getLectureCaptions(lecture.getAsset().getId())
+                .getCaptions()
+                .stream()
+                .filter(this::hasLocale)
+                .map(c -> {
+                    CourseContent s = new CourseContent();
+                    s.setFileName(c.getFileName());
+                    s.setFileUrl(c.getUrl());
+                    s.setCourseName(course.getCourseName());
+                    s.setLectureName(lecture.getTitle());
+                    return s;
+                }).collect(Collectors.toList());
     }
 
     private boolean hasLocale(Caption caption) {
