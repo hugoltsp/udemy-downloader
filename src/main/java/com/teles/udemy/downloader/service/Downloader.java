@@ -42,15 +42,15 @@ public class Downloader {
         return () -> {
             try {
 
-                log.info("Downloading file: [{}] from course: [{}]", c.getVideoFileName(), c.getCourseName());
+                log.info("Downloading file: [{}] from course: [{}]", c.getFileName(), c.getCourseName());
 
                 try (OutputStream outputStream = new BufferedOutputStream(createFile(c), BUFFER_SIZE);
-                     InputStream inputStream = new URL(c.getVideoUrl()).openStream()) {
+                     InputStream inputStream = new URL(c.getFileUrl()).openStream()) {
                     write(outputStream, inputStream);
                 }
 
             } catch (IOException e) {
-                log.error("An error ocurred while trying to download this file [{}]", c.getVideoUrl(), e);
+                log.error("An error ocurred while trying to download this file [{}]", c.getFileUrl(), e);
             }
         };
     }
@@ -77,7 +77,7 @@ public class Downloader {
         return new StringBuilder()
                 .append(c.getCourseName()).append(SLASH)
                 .append(c.getLectureName()).append(SLASH)
-                .append(c.getVideoFileName()).toString();
+                .append(c.getFileName()).toString();
     }
 
 }

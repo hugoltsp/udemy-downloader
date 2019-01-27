@@ -2,7 +2,6 @@ package com.teles.udemy.downloader.service;
 
 import com.teles.udemy.downloader.domain.dto.Course;
 import com.teles.udemy.downloader.domain.dto.Course.CourseContent;
-import com.teles.udemy.downloader.domain.dto.Course.CourseContent.Subtitle;
 import com.teles.udemy.downloader.domain.dto.CourseResponse.Lecture;
 import com.teles.udemy.downloader.domain.dto.LectureAssetsResponse;
 import com.teles.udemy.downloader.domain.dto.LectureAssetsResponse.Caption;
@@ -76,21 +75,31 @@ public class CourseContentFetcher {
                     CourseContent courseContent = new CourseContent();
                     courseContent.setCourseName(course.getCourseName());
                     courseContent.setLectureName(lecture.getTitle());
-                    courseContent.setVideoFileName(udemyResource.getLectureDetails(lecture.getAsset().getId()).getTitle());
-                    courseContent.setVideoUrl(assetsResponse.getStreamContents()
+                    courseContent.setFileName(udemyResource.getLectureDetails(lecture.getAsset().getId()).getTitle());
+                    courseContent.setFileUrl(assetsResponse.getStreamContents()
                             .getVideos()
                             .stream()
                             .filter(v -> v.getResolution().equals(settings.getVideoResolution()))
                             .findFirst()
                             .get()
                             .getFile());
-                    courseContent.setSubtitles(udemyResource.getLectureCaptions(lecture.getAsset().getId()).getCaptions()
+
+                    List<CourseContent> collect = udemyResource.getLectureCaptions(lecture.getAsset().getId())
+                            .getCaptions()
                             .stream()
                             .filter(this::hasLocale)
-                            .map(Subtitle::build)
-                            .collect(Collectors.toList()));
+                            .map(c -> {
+                                CourseContent s = new CourseContent();
+                                s.setFileName(c.getFileName());
+                                s.setFileUrl(c.getUrl());
+                                s.setCourseName(course.getCourseName());
+                                s.setLectureName(lecture.getTitle());
+                                return s;
+                            }).collect(Collectors.toList());
 
                     course.getContents().add(courseContent);
+                    course.getContents().addAll(collect);
+
                 }
 
             });
@@ -99,7 +108,6 @@ public class CourseContentFetcher {
 
         return courses.stream().map(Course::getContents).flatMap(Collection::stream).collect(Collectors.toList());
     }
-
 
     private boolean hasLocale(Caption caption) {
         Map<String, String> locale = caption.getLocale();

@@ -1,6 +1,5 @@
 package com.teles.udemy.downloader.domain.dto;
 
-import com.teles.udemy.downloader.domain.dto.LectureAssetsResponse.Caption;
 import com.teles.udemy.downloader.domain.dto.SubscribedCoursesResponse.SubscribedCourse;
 import lombok.Data;
 
@@ -30,27 +29,9 @@ public class Course {
 
         private String lectureName;
 
-        private String videoFileName;
+        private String fileName;
 
-        private String videoUrl;
-
-        private List<Subtitle> subtitles = new ArrayList<>();
-
-        @Data
-        public static class Subtitle{
-
-            private String subtitleFileName;
-
-            private String subtitleUrl;
-
-            public static Subtitle build(Caption caption){
-                Subtitle subtitle = new Subtitle();
-                subtitle.setSubtitleFileName(caption.getFileName());
-                subtitle.setSubtitleUrl(caption.getUrl());
-                return subtitle;
-            }
-
-        }
+        private String fileUrl;
 
     }
 
