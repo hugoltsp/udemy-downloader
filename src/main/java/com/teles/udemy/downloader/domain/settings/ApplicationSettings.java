@@ -25,6 +25,8 @@ public class ApplicationSettings {
 
     private String courses;
 
+    private String subtitleLanguage;
+
     public boolean shouldFilterCourses() {
         return courses != null && !courses.trim().isEmpty();
     }

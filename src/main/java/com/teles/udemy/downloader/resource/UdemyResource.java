@@ -22,11 +22,17 @@ public interface UdemyResource {
     @RequestLine("GET /courses/{courseId}/cached-subscriber-curriculum-items/?page_size=1400")
     CourseResponse getCourse(@Param("courseId") Long courseId);
 
+    @RequestLine("GET /courses/{courseId}/cached-subscriber-curriculum-items/?page_size=1400&fields[lecture]=@min,object_index,asset,supplementary_assets,sort_order,is_published,is_free&fields[quiz]=@min,object_index,title,sort_order,is_published&fields[practice]=@min,object_index,title,sort_order,is_published&fields[chapter]=@min,description,object_index,title,sort_order,is_published&fields[asset]=@min,title,filename,asset_type,external_url,length,status")
+    Object getCourse2(@Param("courseId") Long courseId);
+
     @RequestLine("GET /assets/{assetId}?fields[asset]=stream_urls")
     LectureAssetsResponse getAssets(@Param("assetId") Long assetId);
 
     @RequestLine("GET /assets/{assetId}")
     LectureAssetsResponse getLectureDetails(@Param("assetId") Long assetId);
+
+    @RequestLine("GET /assets/{assetId}?fields[asset]=captions")
+    LectureAssetsResponse getLectureCaptions(@Param("assetId") Long assetId);
 
     @Configuration
     class Config {

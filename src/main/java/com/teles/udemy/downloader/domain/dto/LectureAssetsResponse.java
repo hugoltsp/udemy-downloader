@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class LectureAssetsResponse {
@@ -33,8 +35,12 @@ public class LectureAssetsResponse {
     @Data
     public static class Caption {
 
+        @JsonProperty("title")
+        private String fileName;
+
         private String url;
 
+        private Map<String, String> locale = new LinkedHashMap<>();
     }
 
     @Data

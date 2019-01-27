@@ -2,8 +2,10 @@ package com.teles.udemy.downloader.service;
 
 import com.teles.udemy.downloader.domain.dto.Course;
 import com.teles.udemy.downloader.domain.dto.Course.CourseContent;
+import com.teles.udemy.downloader.domain.dto.Course.CourseContent.Subtitle;
 import com.teles.udemy.downloader.domain.dto.CourseResponse.Lecture;
 import com.teles.udemy.downloader.domain.dto.LectureAssetsResponse;
+import com.teles.udemy.downloader.domain.dto.LectureAssetsResponse.Caption;
 import com.teles.udemy.downloader.domain.dto.SubscribedCoursesResponse.SubscribedCourse;
 import com.teles.udemy.downloader.domain.settings.ApplicationSettings;
 import com.teles.udemy.downloader.resource.UdemyResource;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,11 +34,11 @@ public class CourseContentFetcher {
 
         List<Course> courses = new ArrayList<>();
 
-        log.info("Getting subscribed courses...");
+        log.info("Getting content from subscribed courses...");
 
         List<SubscribedCourse> subscribedCoursesCourses = udemyResource.getSubscribedCourses().getCourses();
 
-        log.info("A total of [{}] courses found. Titles are: {}", subscribedCoursesCourses.size(), subscribedCoursesCourses
+        log.info("A total of [{}] enrolled courses found. Titles are: {}", subscribedCoursesCourses.size(), subscribedCoursesCourses
                 .stream()
                 .map(SubscribedCourse::getTitle)
                 .collect(Collectors.joining("\n")));
@@ -62,7 +65,7 @@ public class CourseContentFetcher {
                     .filter(Lecture::hasAsset)
                     .collect(Collectors.toList());
 
-            log.info("Found [{}] downloadable lectures.", lectures.size());
+            log.info("Found [{}] lectures.", lectures.size());
 
             lectures.parallelStream().forEach(lecture -> {
 
@@ -81,6 +84,12 @@ public class CourseContentFetcher {
                             .findFirst()
                             .get()
                             .getFile());
+                    courseContent.setSubtitles(udemyResource.getLectureCaptions(lecture.getAsset().getId()).getCaptions()
+                            .stream()
+                            .filter(this::hasLocale)
+                            .map(Subtitle::build)
+                            .collect(Collectors.toList()));
+
                     course.getContents().add(courseContent);
                 }
 
@@ -91,4 +100,11 @@ public class CourseContentFetcher {
         return courses.stream().map(Course::getContents).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
+
+    private boolean hasLocale(Caption caption) {
+        Map<String, String> locale = caption.getLocale();
+
+        return locale.containsKey("locale") && (locale.get("locale").equals("en_US")
+                || locale.get("locale").equals(settings.getSubtitleLanguage()));
+    }
 }

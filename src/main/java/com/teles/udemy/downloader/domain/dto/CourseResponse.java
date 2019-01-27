@@ -21,6 +21,8 @@ public class CourseResponse {
 
         private Asset asset;
 
+        private int index;
+
         public boolean hasAsset() {
             return asset != null;
         }

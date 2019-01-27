@@ -17,7 +17,10 @@ public class Application implements CommandLineRunner {
 
     public static void main(String[] args) throws ParseException {
         CommandLine commandLine = new DefaultParser().parse(OPTIONS, args);
-        System.setProperty("app.authorizationToken", commandLine.getOptionValue("token"));
+
+        if (commandLine.hasOption("token")) {
+            System.setProperty("app.authorizationToken", commandLine.getOptionValue("token"));
+        }
 
         if (commandLine.hasOption("courses")) {
             System.setProperty("app.courses", commandLine.getOptionValue("courses"));
@@ -40,7 +43,7 @@ public class Application implements CommandLineRunner {
 
         Options options = new Options();
 
-        options.addOption(Option.builder().longOpt("token").hasArg().required().build());
+        options.addOption(Option.builder().longOpt("token").hasArg().build());
         options.addOption(Option.builder().longOpt("courses").hasArg().build());
 
         return options;
