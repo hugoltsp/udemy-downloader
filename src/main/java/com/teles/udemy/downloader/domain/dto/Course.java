@@ -29,6 +29,8 @@ public class Course {
 
         private String lectureName;
 
+        private int index;
+
         private String fileName;
 
         private String fileUrl;

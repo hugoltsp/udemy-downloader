@@ -91,7 +91,7 @@ public class CourseContentFetcher {
         return courses.stream().map(Course::getContents).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
-    private List<Lecture> getLectures(Long courseId){
+    private List<Lecture> getLectures(Long courseId) {
         return udemyResource.getCourse(courseId)
                 .getLectures()
                 .stream()
