@@ -4,5 +4,5 @@ app:
   videoResolution: 720
   output: ${HOME}/udemy-out
   concurrentDownloads: 10
-  courses: 
+  courses:
   subtitleLanguage: pt_BR

@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -54,11 +56,26 @@ public class CourseContentFetcher {
                     .collect(Collectors.joining("\n")));
         }
 
+        Map<Long, AtomicInteger> countByCourse = new ConcurrentHashMap<>();
+
         subscribedCoursesCourses.stream().map(Course::build).peek(courses::add).forEach(course -> {
 
             log.info("Getting lectures from course: [{}]", course.getCourseName());
 
-            List<Lecture> lectures = getLectures(course.getCourseId());
+            List<Lecture> lectures = getLectures(course.getCourseId())
+                    .stream()
+                    .map(l -> {
+
+                        if (countByCourse.containsKey(course.getCourseId())) {
+                            countByCourse.get(course.getCourseId()).incrementAndGet();
+                        } else {
+                            countByCourse.put(course.getCourseId(), new AtomicInteger(1));
+                        }
+
+                        l.setIndex(countByCourse.get(course.getCourseId()).get());
+                        return l;
+
+                    }).collect(Collectors.toList());
 
             log.info("Found [{}] lectures.", lectures.size());
 
@@ -80,8 +97,9 @@ public class CourseContentFetcher {
                             .get()
                             .getFile());
 
+                    courseContent.setIndex(lecture.getIndex());
                     course.getContents().add(courseContent);
-                    course.getContents().addAll(getSubtitles(lecture, course));
+                    course.getContents().addAll(getSubtitles(lecture, course, lecture.getIndex()));
                 }
 
             });
@@ -99,7 +117,7 @@ public class CourseContentFetcher {
                 .collect(Collectors.toList());
     }
 
-    private List<CourseContent> getSubtitles(Lecture lecture, Course course) {
+    private List<CourseContent> getSubtitles(Lecture lecture, Course course, int lectureIndex) {
         return udemyResource.getLectureCaptions(lecture.getAsset().getId())
                 .getCaptions()
                 .stream()
@@ -110,6 +128,7 @@ public class CourseContentFetcher {
                     s.setFileUrl(c.getUrl());
                     s.setCourseName(course.getCourseName());
                     s.setLectureName(lecture.getTitle());
+                    s.setIndex(lectureIndex);
                     return s;
                 }).collect(Collectors.toList());
     }

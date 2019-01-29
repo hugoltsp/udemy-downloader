@@ -76,6 +76,8 @@ public class Downloader {
     private String buildFileName(CourseContent c) {
         return new StringBuilder()
                 .append(c.getCourseName()).append(SLASH)
+                .append(c.getIndex())
+                .append("-")
                 .append(c.getLectureName()).append(SLASH)
                 .append(c.getFileName()).toString();
     }
